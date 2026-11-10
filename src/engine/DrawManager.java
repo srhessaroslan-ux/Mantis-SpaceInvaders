@@ -54,7 +54,7 @@ public final class DrawManager {
 	private static final int ITEM_PANEL_TOP = 43;
 	private static final int ITEM_SLOT_HEIGHT = 16;
 	/** Item panel font size: small and fixed so the panel fits one line. */
-	private static final float ITEM_FONT_SIZE = 9f;
+	private static final float ITEM_FONT_SIZE = 8f;
 	/** Item notice baseline, measured up from the bottom of the screen. */
 	private static final int ITEM_NOTICE_BOTTOM_OFFSET = 60;
 	/** The shield bubble blinks during this many last milliseconds. */
@@ -114,7 +114,6 @@ public final class DrawManager {
 		ShipFastAttack,
 		/** Big Bullet player ship. */
 		ShipBigBullet,
-
 		/** First Flight achievement icon. */
 		FirstFlight,
 		/** Fleet Master achievement icon. */
@@ -235,24 +234,24 @@ public final class DrawManager {
 			logger.info("Finished loading the sprites.");
 
 			// Font loading.
-			fontRegular = fileManager.loadFont(14f);
+			fontRegular = fileManager.loadFont(16f);
 			fontBig = fileManager.loadFont(24f);
 			logger.info("Finished loading the fonts.");
 
 		} catch (IOException e) {
 			logger.warning("Loading failed: " + e.getMessage());
-			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 14);
-			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 24);
+			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 16);
 		} catch (FontFormatException e) {
 			logger.warning("Font formating failed.");
-			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 14);
-			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 24);
+			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 16);
 		}
 
 		// Derived outside the try so it is set on the fallback path too.
 		// While it was inside, a missing font file left it null and the game
 		// died on the first frame.
-		fontSelected = fontRegular.deriveFont(17f);
+		fontSelected = fontRegular.deriveFont(16f);
 	}
 
 	/**
@@ -602,14 +601,14 @@ public final class DrawManager {
 	public void drawItemHint(final Screen screen, final ItemSystem items) {
 		int slots = items.api().getView().slots.size();
 		backBufferGraphics.setColor(Color.GRAY);
-		drawCenteredRegularString(screen, "Catch item drops with your ship",
+		drawCenteredSmallString(screen, "Catch item drops with your ship",
 				screen.getHeight() * 2 / 3);
-		drawCenteredRegularString(screen, "Keys 1-" + slots
+		drawCenteredSmallString(screen, "Keys 1-" + slots
 				+ " use stored items", screen.getHeight() * 2 / 3
 				+ fontRegularMetrics.getHeight());
 		ItemAPI.ItemInfo equipped = items.equippedThisRun();
 		if (equipped != null)
-			drawCenteredRegularString(screen, "Equipped: " + equipped.displayName,
+			drawCenteredSmallString(screen, "Equipped: " + equipped.displayName,
 					screen.getHeight() * 2 / 3 + fontRegularMetrics.getHeight() * 2);
 	}
 
@@ -669,10 +668,10 @@ public final class DrawManager {
 		final int iconSize = 14;
 		final int iconTextGap = 6;
 
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(smallFont());
 		String balanceString = Integer.toString(coins);
 		int totalWidth = iconSize + iconTextGap
-				+ fontRegularMetrics.stringWidth(balanceString);
+				+ getSmallStringWidth(balanceString);
 		int startX = (screen.getWidth() - totalWidth) / 2;
 
 		backBufferGraphics.setColor(Color.YELLOW);
@@ -700,10 +699,10 @@ public final class DrawManager {
 		final int iconSize = 14;
 		final int iconTextGap = 6;
 
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(smallFont());
 		String balanceString = Integer.toString(diamonds);
 		int totalWidth = iconSize + iconTextGap
-				+ fontRegularMetrics.stringWidth(balanceString);
+				+ getSmallStringWidth(balanceString);
 		int startX = (screen.getWidth() - totalWidth) / 2;
 		int iconTop = positionY - iconSize + 1;
 
@@ -839,12 +838,12 @@ public final class DrawManager {
 	public void drawScore(final Screen screen, final int score) {
 		int textY = 25;
 
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(smallFont());
 		String label = "SCORE";
 		String scoreString = Integer.toString(score);
 
-		int scoreWidth = fontRegularMetrics.stringWidth(scoreString);
-		int labelWidth = fontRegularMetrics.stringWidth(label);
+		int scoreWidth = getSmallStringWidth(scoreString);
+		int labelWidth = getSmallStringWidth(label);
 		int scoreX = screen.getWidth() - SCORE_ZONE_MARGIN - scoreWidth;
 		int labelX = scoreX - SCORE_LABEL_GAP - labelWidth;
 
@@ -869,7 +868,7 @@ public final class DrawManager {
 	private static final int LIVES_ICON_SPACING = 35;
 
 	public void drawLives(final Screen screen, final int lives) {
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(smallFont());
 		backBufferGraphics.setColor(Color.WHITE);
 		backBufferGraphics.drawString("LIVES", 20, 25);
 
@@ -901,9 +900,9 @@ public final class DrawManager {
 		String label = "LEVEL";
 		String valueString = Integer.toString(level);
 
-		backBufferGraphics.setFont(fontRegular);
-		int labelWidth = fontRegularMetrics.stringWidth(label);
-		int valueWidth = fontRegularMetrics.stringWidth(valueString);
+		backBufferGraphics.setFont(smallFont());
+		int labelWidth = getSmallStringWidth(label);
+		int valueWidth = getSmallStringWidth(valueString);
 		int gap = 6;
 		int totalWidth = labelWidth + gap + valueWidth;
 		int labelX = (screen.getWidth() - totalWidth) / 2;
@@ -946,7 +945,7 @@ public final class DrawManager {
 
 		backBufferGraphics.setColor(Color.CYAN);
 		backBufferGraphics.fillPolygon(xPoints, yPoints, 4);
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(smallFont());
 		backBufferGraphics.setColor(Color.WHITE);
 		backBufferGraphics.drawString(valueString, startX + DIAMOND_ICON_SIZE
 				+ DIAMOND_ICON_GAP, textY);
@@ -1017,7 +1016,7 @@ public final class DrawManager {
 		String titleString = "Invaders";
 
 		backBufferGraphics.setColor(Color.GREEN);
-		drawCenteredBigString(screen, titleString, screen.getHeight() / 3);
+		drawCenteredBigString(screen, titleString, screen.getHeight() *2/5);
 	}
 
 	/**
@@ -1096,7 +1095,7 @@ public final class DrawManager {
 	 * @return Baseline of the item's text.
 	 */
 	private int menuItemBaseline(final Screen screen, final int index) {
-		return screen.getHeight() / 2 + menuItemSpacing() * (index + 2);
+		return screen.getHeight() / 2 + menuItemSpacing() * (index + 0);
 	}
 
 	/**
@@ -1118,13 +1117,14 @@ public final class DrawManager {
 	 *            Keys to show, already worded for the current state.
 	 */
 	public void drawKeyHints(final Screen screen, final String hints) {
-		Font hintFont = fontRegular;
-		FontMetrics metrics = fontRegularMetrics;
+		Font hintFont = fontRegular.deriveFont(8f);
+		FontMetrics metrics = backBufferGraphics.getFontMetrics(hintFont);
 		int maxWidth = screen.getWidth() - 20;
 		int textWidth = metrics.stringWidth(hints);
 		if (textWidth > maxWidth) {
+            float fitted = fontRegular.getSize2D()*maxWidth/textWidth;
 			hintFont = fontRegular.deriveFont(
-					fontRegular.getSize2D() * maxWidth / textWidth);
+					Math.max(8f,(float) (Math.floor(fitted/8)*8)));
 			metrics = backBufferGraphics.getFontMetrics(hintFont);
 		}
 		backBufferGraphics.setFont(hintFont);
@@ -1416,15 +1416,15 @@ public final class DrawManager {
 		int height = isNewRecord ? 4 : 2;
 
 		backBufferGraphics.setColor(Color.WHITE);
-		drawCenteredRegularString(screen, scoreString, screen.getHeight()
+		drawCenteredMediumString(screen, scoreString, screen.getHeight()
 				/ height);
-		drawCenteredRegularString(screen, livesRemainingString,
+		drawCenteredMediumString(screen, livesRemainingString,
 				screen.getHeight() / height + fontRegularMetrics.getHeight()
 						* 2);
-		drawCenteredRegularString(screen, shipsDestroyedString,
+		drawCenteredMediumString(screen, shipsDestroyedString,
 				screen.getHeight() / height + fontRegularMetrics.getHeight()
 						* 4);
-		drawCenteredRegularString(screen, accuracyString, screen.getHeight()
+		drawCenteredMediumString(screen, accuracyString, screen.getHeight()
 				/ height + fontRegularMetrics.getHeight() * 6);
 	}
 
@@ -1503,7 +1503,7 @@ public final class DrawManager {
 			backBufferGraphics.setColor(Color.GREEN);
 		else
 			backBufferGraphics.setColor(Color.GRAY);
-		drawCenteredRegularString(screen, continueOrExitString,
+		drawCenteredMediumString(screen, continueOrExitString,
 				screen.getHeight() / 2 + fontRegularMetrics.getHeight() * 10);
 	}
 
@@ -1542,7 +1542,7 @@ public final class DrawManager {
 		for (Score score : highScores) {
 			scoreString = String.format("%s        %04d", score.getName(),
 					score.getScore());
-			drawCenteredRegularString(screen, scoreString, screen.getHeight()
+			drawCenteredMediumString(screen, scoreString, screen.getHeight()
 					/ 4 + fontRegularMetrics.getHeight() * (i + 1) * 2);
 			i++;
 		}
@@ -1865,6 +1865,33 @@ public final class DrawManager {
 			fontSmall = fontRegular.deriveFont(SMALL_FONT_SIZE);
 		return fontSmall;
 	}
+    /**
+     * Draws a string centered horizontally, in the small font.
+     *
+     * Works like drawCenteredRegularString. Used where text in tutorial instructions has a specific
+     * size set. The text takes the current drawing colour, so set the colour before calling it.
+     *
+     * @param screen
+     *            Screen to draw on.
+     * @param string
+     *            Text to draw.
+     * @param height
+     *            Baseline height of the text.
+     */
+    public void drawCenteredMediumString(final Screen screen,final String string, final int height) {
+
+        Font tutorialFont = fontRegular.deriveFont(10f);
+
+        backBufferGraphics.setFont(tutorialFont);
+        backBufferGraphics.setColor(Color.GREEN);
+
+        FontMetrics metrics = backBufferGraphics.getFontMetrics(tutorialFont);
+
+        int textWidth = metrics.stringWidth(string);
+        int x = (screen.getWidth() - textWidth) / 2;
+
+        backBufferGraphics.drawString(string, x, height);
+    }
 
 	/**
 	 * Draws a filled rectangle, e.g. a highlighted tab or row.
@@ -1907,6 +1934,12 @@ public final class DrawManager {
 		backBufferGraphics.setColor(color);
 		backBufferGraphics.drawString(string, positionX, positionY);
 	}
+    public void drawCenteredSmallString(final Screen screen,
+                                        final String string, final int height) {
+        backBufferGraphics.setFont(smallFont());
+        backBufferGraphics.drawString(string, screen.getWidth() / 2
+                - getSmallStringWidth(string) / 2, height);
+    }
 
 	/**
 	 * Measures text in the small font.

@@ -154,18 +154,18 @@ public final class TutorialScreen extends Screen {
             instruction = "Tutorial complete!";
             break;
         }
-        drawManager.drawCenteredRegularString(this, instruction, 105);
+        drawManager.drawCenteredMediumString(this, instruction, 105);
         if (step == Step.COMPLETE) {
-            drawManager.drawCenteredRegularString(this,
+            drawManager.drawCenteredMediumString(this,
                     "Stronger enemies and bosses", 150);
-            drawManager.drawCenteredRegularString(this,
+            drawManager.drawCenteredMediumString(this,
                     "await in later stages.", 175);
-            drawManager.drawCenteredRegularString(this,
+            drawManager.drawCenteredMediumString(this,
                     "Press ENTER to start Stage 1", 220);
         } else {
-            drawManager.drawCenteredRegularString(this,
+            drawManager.drawCenteredMediumString(this,
                     "Clear the wave to finish.", 140);
-            drawManager.drawCenteredRegularString(this,
+            drawManager.drawCenteredMediumString(this,
                     "Practice enemy will not attack.", 165);
         }
         drawManager.drawEntity(ship, ship.getPositionX(), ship.getPositionY());

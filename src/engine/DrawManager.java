@@ -67,11 +67,16 @@ public final class DrawManager {
 	private static Font fontRegular;
 	/** Normal sized font properties. */
 	private static FontMetrics fontRegularMetrics;
+    /** Medium sized font. (Smaller than regular, bigger than small) */
+    private static final float MEDIUM_FONT_SIZE = 10f;
+    /**Medium sized font.*/
+    private static Font fontMedium;
+    /** Medium sized font properties*/
+    private static FontMetrics fontMediumMetrics;
 	/** Big sized font. */
 	private static Font fontBig;
 	/** Big sized font properties. */
 	private static FontMetrics fontBigMetrics;
-
 	/** Font used for the highlighted menu item. */
 	private static Font fontSelected;
 	/** Highlighted menu item font properties. */
@@ -163,7 +168,10 @@ public final class DrawManager {
 		MidBoss1,
 		MidBoss2,
 		FinalBoss1,
-		FinalBoss2
+		FinalBoss2,
+
+        /** Title */
+        Title
 	};
 
 	/**
@@ -229,6 +237,7 @@ public final class DrawManager {
 			spriteMap.put(SpriteType.ShipSkinD1, new boolean[13][8]);
 			spriteMap.put(SpriteType.ShipSkinD2, new boolean[13][8]);
 			spriteMap.put(SpriteType.ShipSkinD3, new boolean[13][8]);
+            spriteMap.put(SpriteType.Title, new boolean[96][16]);
 
 			fileManager.loadSprite(spriteMap);
 			logger.info("Finished loading the sprites.");
@@ -240,18 +249,19 @@ public final class DrawManager {
 
 		} catch (IOException e) {
 			logger.warning("Loading failed: " + e.getMessage());
-			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 24);
 		} catch (FontFormatException e) {
 			logger.warning("Font formating failed.");
-			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 24);
 		}
 
 		// Derived outside the try so it is set on the fallback path too.
 		// While it was inside, a missing font file left it null and the game
 		// died on the first frame.
-		fontSelected = fontRegular.deriveFont(16f);
+		fontSelected = fontRegular.deriveFont(20f);
+        fontMedium = fontRegular.deriveFont(MEDIUM_FONT_SIZE);
 	}
 
 	/**
@@ -287,6 +297,9 @@ public final class DrawManager {
 		if (fontRegular == null) {
 			fontRegular = new Font(Font.MONOSPACED, Font.PLAIN, 14);
 		}
+        if (fontMedium == null){
+            fontMedium = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+        }
 		if (fontBig == null) {
 			fontBig = new Font(Font.MONOSPACED, Font.PLAIN, 24);
 		}
@@ -306,6 +319,7 @@ public final class DrawManager {
 				.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 
 		fontRegularMetrics = backBufferGraphics.getFontMetrics(fontRegular);
+        fontMediumMetrics = backBufferGraphics.getFontMetrics(fontMedium);
 		fontBigMetrics = backBufferGraphics.getFontMetrics(fontBig);
 		fontSelectedMetrics = backBufferGraphics.getFontMetrics(fontSelected);
 
@@ -1013,11 +1027,14 @@ public final class DrawManager {
 	 *            Screen to draw on.
 	 */
 	public void drawTitle(final Screen screen) {
-		String titleString = "Invaders";
+        int[] size = getSpriteSize(SpriteType.Title);
+        int scale = 4;
+        drawSpriteScaled(SpriteType.Title,
+                (screen.getWidth() - size[0] * scale) / 2,
+                screen.getHeight() / 3 - size[1] * scale,
+                scale, Color.GREEN);
+    }
 
-		backBufferGraphics.setColor(Color.GREEN);
-		drawCenteredBigString(screen, titleString, screen.getHeight() *2/5);
-	}
 
 	/**
 	 * Draws the main menu, one row per item, through drawMenuRow so the
@@ -1104,7 +1121,7 @@ public final class DrawManager {
 	 * @return Spacing, in pixels.
 	 */
 	private int menuItemSpacing() {
-		return fontRegularMetrics.getHeight() * 5 / 4;
+		return fontRegularMetrics.getHeight() * 3 / 2;
 	}
 
 	/**
@@ -1323,7 +1340,7 @@ public final class DrawManager {
 		drawSprite(achievement.getSpriteType(),
 				iconX, nameY - 20,
 				achievement.isUnlocked() ? achievement.getIconColor() : Color.DARK_GRAY);
-		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setFont(fontMedium);
 		backBufferGraphics.setColor(achievement.isUnlocked() ? Color.WHITE
 				: Color.GRAY);
 		backBufferGraphics.drawString(achievement.getName() + " - " + status,
@@ -1331,7 +1348,7 @@ public final class DrawManager {
 		backBufferGraphics.setColor(Color.GRAY);
 		backBufferGraphics.drawString(Core.getAchievementManager()
 						.getRequirementText(achievement), contentX,
-				nameY + fontRegularMetrics.getHeight() * 2);
+				nameY + fontMediumMetrics.getHeight() * 2);
 	}
 	/**Draw smaller sprite in achievement
 	 *
@@ -1866,31 +1883,33 @@ public final class DrawManager {
 		return fontSmall;
 	}
     /**
-     * Draws a string centered horizontally, in the small font.
+     * Draws a string centered horizontally, in the medium font. The text
+     * takes the current drawing colour, so set the colour before calling it.
      *
-     * Works like drawCenteredRegularString. Used where text in tutorial instructions has a specific
-     * size set. The text takes the current drawing colour, so set the colour before calling it.
-     *
-     * @param screen
-     *            Screen to draw on.
-     * @param string
-     *            Text to draw.
-     * @param height
-     *            Baseline height of the text.
+     * @param screen Screen to draw on.
+     * @param string Text to draw.
+     * @param height Baseline height of the text.
      */
-    public void drawCenteredMediumString(final Screen screen,final String string, final int height) {
+    public void drawCenteredMediumString(final Screen screen,
+                                         final String string, final int height) {
+        backBufferGraphics.setFont(fontMedium);
+        backBufferGraphics.drawString(string, screen.getWidth() / 2
+                - fontMediumMetrics.stringWidth(string) / 2, height);
+    }
 
-        Font tutorialFont = fontRegular.deriveFont(10f);
-
-        backBufferGraphics.setFont(tutorialFont);
-        backBufferGraphics.setColor(Color.GREEN);
-
-        FontMetrics metrics = backBufferGraphics.getFontMetrics(tutorialFont);
-
-        int textWidth = metrics.stringWidth(string);
-        int x = (screen.getWidth() - textWidth) / 2;
-
-        backBufferGraphics.drawString(string, x, height);
+    /**
+     * Draws a string at a given position, in the medium font.
+     *
+     * @param string    Text to draw.
+     * @param positionX Horizontal position of the left edge.
+     * @param positionY Baseline height of the text.
+     * @param color     Colour of the text.
+     */
+    public void drawMediumString(final String string, final int positionX,
+                                 final int positionY, final Color color) {
+        backBufferGraphics.setFont(fontMedium);
+        backBufferGraphics.setColor(color);
+        backBufferGraphics.drawString(string, positionX, positionY);
     }
 
 	/**

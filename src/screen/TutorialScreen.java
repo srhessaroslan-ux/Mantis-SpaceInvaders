@@ -154,7 +154,7 @@ public final class TutorialScreen extends Screen {
             instruction = "Tutorial complete!";
             break;
         }
-        drawManager.drawCenteredMediumString(this, instruction, 105);
+        drawManager.drawCenteredMediumString(this, instruction, 125);
         if (step == Step.COMPLETE) {
             drawManager.drawCenteredMediumString(this,
                     "Stronger enemies and bosses", 150);

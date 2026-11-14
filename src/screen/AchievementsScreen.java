@@ -15,7 +15,9 @@ import engine.DrawManager;
  * Page 1 shows normal achievements, page 2 shows tier achievements.
  */
 public class AchievementsScreen extends Screen {
-	/**
+    /** Size of the text in the achievements list. */
+    private static final float ACHIEVEMENT_FONT_SIZE = 10f;
+    /**
 	 * Colour of the row the player has selected.
 	 */
 	private static final Color SELECTED = Color.GREEN;
@@ -38,11 +40,11 @@ public class AchievementsScreen extends Screen {
 	/**
 	 * Vertical position of the page label.
 	 */
-	private static final int PAGE_LABEL_Y = 95;
+	private static final int PAGE_LABEL_Y = 115;
 	/**
 	 * Vertical position of the first row.
 	 */
-	private static final int FIRST_ROW_Y = 110;
+	private static final int FIRST_ROW_Y = 130;
 	/**
 	 * Vertical distance between rows.
 	 */
@@ -212,7 +214,7 @@ public class AchievementsScreen extends Screen {
 
 		List<Achievement> page = this.pages.get(this.currentPage);
 		if (page.isEmpty()) {
-			this.drawManager.drawRegularString("No achievements yet.",
+			this.drawManager.drawMediumString("No achievements yet.",
 					TEXT_X, FIRST_ROW_Y + 24, MUTED);
 		} else {
 			for (int i = 0; i < getRowCount(); i++) {
@@ -227,7 +229,7 @@ public class AchievementsScreen extends Screen {
 		}
 		if (this.scrollOffset + getRowCount()
 				< this.pages.get(this.currentPage).size()) {
-			this.drawManager.drawRegularString(
+			this.drawManager.drawMediumString(
 					" ------  MORE ACHIEVEMENT BELOW  ------",
 					TEXT_X,
 					430,
@@ -275,17 +277,17 @@ public class AchievementsScreen extends Screen {
 					icon, TROPHY_X, positionY, trophyColor);
 		}
 
-		this.drawManager.drawRegularString(
-				achievement.getName(),
-				TEXT_X, positionY + 8, nameColor);
+        this.drawManager.drawMediumString(
+                achievement.getName(),
+                TEXT_X, positionY + 8, nameColor);
 
-		this.drawManager.drawRegularString(
-				manager.getRequirementText(achievement),
-				TEXT_X, positionY + 24, MUTED);
+        this.drawManager.drawMediumString(
+                manager.getRequirementText(achievement),
+                TEXT_X, positionY + 24, MUTED);
 
-		this.drawManager.drawRegularString(
-				manager.getProgressText(achievement),
-				STATUS_X, positionY + 8,
-				achievement.isUnlocked() ? SELECTED : MUTED);
+        this.drawManager.drawMediumString(
+                manager.getProgressText(achievement),
+                STATUS_X, positionY + 8,
+                achievement.isUnlocked() ? SELECTED : MUTED);
 	}
 }

@@ -1016,8 +1016,14 @@ public final class DrawManager {
 	public void drawTitle(final Screen screen) {
 		String titleString = "Invaders";
 
+		Font titleFont = fontBig.deriveFont(28f);
+		FontMetrics titleMetrics = backBufferGraphics.getFontMetrics(titleFont);
+
 		backBufferGraphics.setColor(Color.GREEN);
-		drawCenteredBigString(screen, titleString, screen.getHeight() / 3);
+		backBufferGraphics.setFont(titleFont);
+		backBufferGraphics.drawString(titleString,
+				(screen.getWidth() - titleMetrics.stringWidth(titleString)) / 2,
+				screen.getHeight() / 3);
 	}
 
 	/**
@@ -1030,10 +1036,26 @@ public final class DrawManager {
 	 *            Item the cursor is on.
 	 */
 	public void drawMenu(final Screen screen, final MenuItem selected) {
-		for (MenuItem item : MenuItem.values())
-			drawMenuRow(screen, item.getTitle(),
-					menuItemBaseline(screen, item.ordinal()),
-					item == selected, item.isEnabled());
+		Font menuFont = fontRegular.deriveFont(16f);
+		FontMetrics menuMetrics = backBufferGraphics.getFontMetrics(menuFont);
+
+		for (MenuItem item : MenuItem.values()) {
+			int baseline = menuItemBaseline(screen, item.ordinal());
+
+			if (item == selected) {
+				drawMenuRow(screen, item.getTitle(), baseline, true,
+						item.isEnabled());
+			} else {
+				backBufferGraphics.setFont(menuFont);
+				backBufferGraphics.setColor(
+						item.isEnabled() ? Color.WHITE : Color.DARK_GRAY);
+
+				String title = item.getTitle();
+				backBufferGraphics.drawString(title,
+						(screen.getWidth() - menuMetrics.stringWidth(title)) / 2,
+						baseline);
+			}
+		}
 	}
 
 	/**

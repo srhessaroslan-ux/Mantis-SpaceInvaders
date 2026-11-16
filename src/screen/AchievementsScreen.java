@@ -35,20 +35,22 @@ public class AchievementsScreen extends Screen {
 	 * Colour of a locked achievement's icon.
 	 */
 	private static final Color LOCKED = Color.DARK_GRAY;
+	/** Gap between the title baseline and the page label. */
+	private static final int TITLE_TO_PAGE_GAP = 70;
+	/** Gap between the page label and the first achievement row. */
+	private static final int PAGE_TO_ROWS_GAP = 30;
+	/** Maximum vertical distance between achievement rows. */
+	private static final int MAX_ROW_SPACING = 75;
+	/** Minimum vertical distance between achievement rows on short screens. */
+	private static final int MIN_ROW_SPACING = 36;
+	/** Space reserved at the bottom for key hints and breathing room. */
+	private static final int BOTTOM_RESERVED = 80;
+	/** Lowest text line drawn inside an achievement row. */
+	private static final int ROW_TEXT_BOTTOM = 24;
+	/** Width reserved for the achievement list, used to center it. */
+	private static final int CONTENT_WIDTH = 420;
 	/**
-	 * Vertical position of the page label.
-	 */
-	private static final int PAGE_LABEL_Y = 95;
-	/**
-	 * Vertical position of the first row.
-	 */
-	private static final int FIRST_ROW_Y = 110;
-	/**
-	 * Vertical distance between rows.
-	 */
-	private static final int ROW_SPACING = 52;
-	/**
-	 * Horizontal position of the trophy icon.
+	 * Horizontal position of the trophy icon before centering.
 	 */
 	private static final int TROPHY_X = 30;
 	/**
@@ -198,6 +200,41 @@ public class AchievementsScreen extends Screen {
 	}
 
 	/**
+	 * @return Horizontal offset that centers the achievement content.
+	 */
+	private int getContentOffsetX() {
+		return Math.max(0, (this.width - CONTENT_WIDTH) / 2);
+	}
+
+	/**
+	 * @return Baseline of the page label, positioned below the screen title.
+	 */
+	private int getPageLabelY() {
+		return this.height / 8 + TITLE_TO_PAGE_GAP;
+	}
+
+	/**
+	 * @return Vertical position of the first achievement row.
+	 */
+	private int getFirstRowY() {
+		return getPageLabelY() + PAGE_TO_ROWS_GAP;
+	}
+
+	/**
+	 * @return Row spacing, reduced when necessary to keep all visible rows
+	 *         above the key hints on shorter screens.
+	 */
+	private int getRowSpacing() {
+		int rowSlots = Math.max(1,
+				AchievementManager.ACHIEVEMENTS_PER_PAGE - 1);
+		int available = this.height - BOTTOM_RESERVED
+				- getFirstRowY() - ROW_TEXT_BOTTOM;
+		int spacing = available / rowSlots;
+		return Math.max(MIN_ROW_SPACING,
+				Math.min(MAX_ROW_SPACING, spacing));
+	}
+
+	/**
 	 * Draws the title, the page label, the current page's rows, and the
 	 * key hints.
 	 */
@@ -208,29 +245,35 @@ public class AchievementsScreen extends Screen {
 
 		String pageLabel = "< " + PAGE_NAMES[this.currentPage] + "  "
 				+ (this.currentPage + 1) + "/" + this.pages.size() + " >";
-		this.drawManager.drawMenuRow(this, pageLabel, PAGE_LABEL_Y, false);
+		this.drawManager.drawMenuRow(
+				this, pageLabel, getPageLabelY(), false);
 
 		List<Achievement> page = this.pages.get(this.currentPage);
+		int firstRowY = getFirstRowY();
+		int rowSpacing = getRowSpacing();
+		int rowCount = getRowCount();
 		if (page.isEmpty()) {
 			this.drawManager.drawRegularString("No achievements yet.",
-					TEXT_X, FIRST_ROW_Y + 24, MUTED);
+					TEXT_X + getContentOffsetX(),
+					firstRowY + ROW_TEXT_BOTTOM, MUTED);
 		} else {
-			for (int i = 0; i < getRowCount(); i++) {
+			for (int i = 0; i < rowCount; i++) {
 				int achievementIndex = this.scrollOffset + i;
 
 				drawAchievement(
 						page.get(achievementIndex),
-						FIRST_ROW_Y + i * ROW_SPACING,
+						firstRowY + i * rowSpacing,
 						achievementIndex == this.selected);
 			}
-
 		}
-		if (this.scrollOffset + getRowCount()
-				< this.pages.get(this.currentPage).size()) {
+		if (this.scrollOffset + rowCount < page.size()) {
+			int lastRowY = firstRowY + (rowCount - 1) * rowSpacing;
+			int moreY = Math.min(lastRowY + ROW_TEXT_BOTTOM + 18,
+					this.height - BOTTOM_RESERVED / 2);
 			this.drawManager.drawRegularString(
 					" ------  MORE ACHIEVEMENT BELOW  ------",
-					TEXT_X,
-					430,
+					TEXT_X + getContentOffsetX(),
+					moreY,
 					MUTED);
 		}
 
@@ -259,6 +302,7 @@ public class AchievementsScreen extends Screen {
 		}
 
 		Color nameColor = isSelected ? SELECTED : UNSELECTED;
+		int horizontalOffset = getContentOffsetX();
 
 		DrawManager.SpriteType icon = achievement.getSpriteType();
 
@@ -269,23 +313,23 @@ public class AchievementsScreen extends Screen {
 
 		if (icon == DrawManager.SpriteType.FleetMaster) {
 			this.drawManager.drawSmallSprite(
-					icon, TROPHY_X, positionY, trophyColor);
+					icon, TROPHY_X + horizontalOffset, positionY, trophyColor);
 		} else {
 			this.drawManager.drawSprite(
-					icon, TROPHY_X, positionY, trophyColor);
+					icon, TROPHY_X + horizontalOffset, positionY, trophyColor);
 		}
 
 		this.drawManager.drawRegularString(
 				achievement.getName(),
-				TEXT_X, positionY + 8, nameColor);
+				TEXT_X + horizontalOffset, positionY + 8, nameColor);
 
 		this.drawManager.drawRegularString(
 				manager.getRequirementText(achievement),
-				TEXT_X, positionY + 24, MUTED);
+				TEXT_X + horizontalOffset, positionY + 24, MUTED);
 
 		this.drawManager.drawRegularString(
 				manager.getProgressText(achievement),
-				STATUS_X, positionY + 8,
+				STATUS_X + horizontalOffset, positionY + 8,
 				achievement.isUnlocked() ? SELECTED : MUTED);
 	}
 }

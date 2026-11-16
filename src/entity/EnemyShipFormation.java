@@ -203,8 +203,23 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
 	 * @param newScreen
 	 *            Screen to attach.
 	 */
+
 	public final void attach(final Screen newScreen) {
 		screen = newScreen;
+
+		// Centre the initial enemy formation horizontally.
+		int centeredX = (newScreen.getWidth() - this.width) / 2;
+		int offsetX = centeredX - this.positionX;
+
+		// Move every enemy by the same offset.
+		for (List<EnemyShip> column : this.enemyShips) {
+			for (EnemyShip enemyShip : column) {
+				enemyShip.move(offsetX, 0);
+			}
+		}
+
+		// Update the formation's reference position.
+		this.positionX = centeredX;
 	}
 
 	/**

@@ -95,15 +95,17 @@ public class ShopScreen extends Screen {
 	}
 
 	/** Space between the screen edge and the panels. */
-	private static final int MARGIN = 16;
+	private static final int MARGIN = 12;
 	/** Height of the tab bar. */
 	private static final int TAB_HEIGHT = 20;
 	/** Height of one row in the list. */
-	private static final int ROW_HEIGHT = 30;
-	/** Width of the list on the left. */
-	private static final int LIST_WIDTH = 188;
-	/** Gap between the list and the detail panel. */
+	private static final int ROW_HEIGHT = 40;
+	/** Gap between the item list and the detail panel. */
 	private static final int PANEL_GAP = 8;
+	/** Minimum height reserved for item details on short screens. */
+	private static final int DETAIL_HEIGHT = 250;
+	/** Maximum number of item rows shown before scrolling. */
+	private static final int MAX_VISIBLE_ROWS = 4;
 	/** Width of the scroll arrows column. */
 	private static final int SCROLL_WIDTH = 12;
 	/** How long a purchase message stays on screen. */
@@ -422,7 +424,10 @@ public class ShopScreen extends Screen {
 	}
 
 	private int visibleRows() {
-		return Math.max(1, (bodyBottom() - bodyTop()) / ROW_HEIGHT);
+		int available = bodyBottom() - bodyTop();
+		int rowsForDetails = (available - PANEL_GAP
+				- DETAIL_HEIGHT) / ROW_HEIGHT;
+		return Math.max(1, Math.min(MAX_VISIBLE_ROWS, rowsForDetails));
 	}
 
 	private Rectangle tabArea(final Tab each) {
@@ -433,32 +438,34 @@ public class ShopScreen extends Screen {
 	}
 
 	private Rectangle rowArea(final int row) {
+		int width = this.width - MARGIN * 2 - SCROLL_WIDTH - 2;
 		return new Rectangle(MARGIN, bodyTop() + row * ROW_HEIGHT,
-				LIST_WIDTH - SCROLL_WIDTH - 2, ROW_HEIGHT - 3);
+				width, ROW_HEIGHT - 3);
 	}
 
 	private Rectangle scrollUpArea() {
-		return new Rectangle(MARGIN + LIST_WIDTH - SCROLL_WIDTH, bodyTop(),
+		return new Rectangle(this.width - MARGIN - SCROLL_WIDTH, bodyTop(),
 				SCROLL_WIDTH, ROW_HEIGHT);
 	}
 
 	private Rectangle scrollDownArea() {
-		return new Rectangle(MARGIN + LIST_WIDTH - SCROLL_WIDTH,
+		return new Rectangle(this.width - MARGIN - SCROLL_WIDTH,
 				bodyTop() + (visibleRows() - 1) * ROW_HEIGHT, SCROLL_WIDTH,
 				ROW_HEIGHT);
 	}
 
 	private Rectangle detailArea() {
-		int left = MARGIN + LIST_WIDTH + PANEL_GAP;
-		return new Rectangle(left, bodyTop(), this.width - MARGIN - left,
-				visibleRows() * ROW_HEIGHT - 3);
+		int top = bodyTop() + visibleRows() * ROW_HEIGHT + PANEL_GAP;
+		int availableHeight = Math.max(1, bodyBottom() - top);
+		int height = Math.min(DETAIL_HEIGHT, availableHeight);
+		return new Rectangle(MARGIN, top, this.width - MARGIN * 2, height);
 	}
 
 	/** @return Area of the BUY button(s) row. */
 	private Rectangle buyRow() {
 		Rectangle detail = detailArea();
-		return new Rectangle(detail.x + 12, detail.y + detail.height - 32,
-				detail.width - 24, 22);
+		return new Rectangle(detail.x + 12, detail.y + detail.height - 40,
+				detail.width - 24, 30);
 	}
 
 	/**
@@ -498,7 +505,7 @@ public class ShopScreen extends Screen {
 		drawDetail();
 		drawMessage();
 		this.drawManager.drawKeyHints(this,
-				"arrows/click select | C coins | V diamonds | esc back");
+				"arrows select | C buy | V diamonds | esc back");
 		this.drawManager.completeDrawing(this);
 	}
 

@@ -381,14 +381,16 @@ public class GameScreen extends Screen {
 		super.initialize();
 		this.itemsUsedAtLevelStart =
 				Core.getAchievementManager().getTotalItemsUsed();
-		SoundManager.getInstance().playBgm(Sound.BGM_GAME);
+		final boolean bossStage = this.level == 5 || this.level == 10;
+		SoundManager.getInstance().playBgm(
+				bossStage ? Sound.BGM_BOSS : Sound.BGM_GAME);
 
 		// Initialize the player in both boss and normal stages.
 		this.ship = new Ship(this.width / 2, this.height - 42,
 				Core.getSelectedShipType());
 
 		// Distinct mid-boss and final boss encounters.
-		if (this.level == 5 || this.level == 10) {
+		if (bossStage) {
 			this.midBoss = this.level == 5
 					? new MidBoss(this.width / 2 - 16, 60, DrawManager.SpriteType.MidBoss1)
 					: new FinalBoss(this.width / 2 - 24, 60, DrawManager.SpriteType.FinalBoss1);

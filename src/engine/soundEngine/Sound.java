@@ -66,6 +66,8 @@ public enum Sound {
 	BGM_TITLE("sounds/bgm_title.wav", Category.BGM),
 	/** Background music played during a run. */
 	BGM_GAME("sounds/bgm_game.wav", Category.BGM),
+	/** Background music played during boss encounters. */
+	BGM_BOSS("sounds/bgm_boss.wav", Category.BGM),
 	/** Background music of the shop and other menus. */
 	BGM_MENU("sounds/bgm_menu.wav", Category.BGM);
 

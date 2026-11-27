@@ -13,6 +13,7 @@ import engine.GameState;
 import engine.InputManager;
 import engine.PurchaseManager;
 import engine.WarpIn;
+import engine.soundEngine.Sound;
 import engine.soundEngine.SoundManager;
 import entity.Bullet;
 import entity.EnemyShip;
@@ -142,6 +143,19 @@ public final class FixEpicRegressionTest {
                 "Purchases do not spend score or the other currency");
     }
 
+    private static void testBossMusicSelection() {
+        SoundManager soundManager = SoundManager.getInstance();
+        screen(4, 0);
+        check(soundManager.getCurrentBgm() == Sound.BGM_GAME,
+                "Non-boss stages keep the run music");
+        screen(5, 0);
+        check(soundManager.getCurrentBgm() == Sound.BGM_BOSS,
+                "The first boss stage uses boss music");
+        screen(10, 0);
+        check(soundManager.getCurrentBgm() == Sound.BGM_BOSS,
+                "The second boss stage uses boss music");
+    }
+
     private static void testCountdown() throws Exception {
         GameScreen screen = screen(1, 0);
         Cooldown inputDelay = (Cooldown) field(Screen.class, "inputDelay").get(screen);
@@ -241,6 +255,7 @@ public final class FixEpicRegressionTest {
     public static void main(String[] args) throws Exception {
         Core.getLogger().setUseParentHandlers(false);
         SoundManager.getInstance().setMuted(true);
+        testBossMusicSelection();
         testScoreAndPurchases();
         testCountdown();
         testSpecialRestart();

@@ -99,9 +99,9 @@ public class SettingsScreen extends Screen {
 		int percent = Math.max(0,
 				Math.min(100, currentPercent + delta));
 
+		this.soundManager.setVolume(category, percent / 100f);
 		if (percent != currentPercent)
 			MenuSounds.playMove();
-		this.soundManager.setVolume(category, percent / 100f);
 	}
 	/**
 	 * Starts the action.
@@ -161,9 +161,11 @@ public class SettingsScreen extends Screen {
 		if (isUpDown()) {
 			this.currentMenuItem =
 					(this.currentMenuItem + MAIN_ROWS - 1) % MAIN_ROWS;
+			MenuSounds.playMove();
 			this.selectionCooldown.reset();
 		} else if (isDownDown()) {
 			this.currentMenuItem = (this.currentMenuItem + 1) % MAIN_ROWS;
+			MenuSounds.playMove();
 			this.selectionCooldown.reset();
 		} else if (this.currentMenuItem == CONTROLS_ROW) {
 			if (isSelectDown()) {
@@ -323,9 +325,10 @@ public class SettingsScreen extends Screen {
 					? Sound.Category.BGM
 					: Sound.Category.SFX;
 
-			if (percent != getVolumePercent(category))
-				MenuSounds.playMove();
+			boolean changed = percent != getVolumePercent(category);
 			this.soundManager.setVolume(category, percent / 100f);
+			if (changed)
+				MenuSounds.playMove();
 
 			if (!mousePressed)
 				this.draggingSlider = -1;
